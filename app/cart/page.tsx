@@ -1,0 +1,171 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import styles from './page.module.css';
+
+interface CartItem {
+  id: string;
+  tipo: string;
+  marca: string;
+  modelo: string;
+  cantidad: number;
+  material: string;
+}
+
+export default function CartPage() {
+  const router = useRouter();
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [totalProductos, setTotalProductos] = useState(0);
+  const [isSending, setIsSending] = useState(false);
+
+  useEffect(() => {
+    const savedOrder = localStorage.getItem('nanocarbon_order');
+    if (savedOrder) {
+      const parsed = JSON.parse(savedOrder);
+      setCart(parsed);
+      calcularTotal(parsed);
+    }
+  }, []);
+
+  const calcularTotal = (items: CartItem[]) => {
+    const t = items.reduce((acc, item) => acc + item.cantidad, 0);
+    setTotalProductos(t);
+  };
+
+  const eliminarItem = (id: string) => {
+    const newCart = cart.filter(item => item.id !== id);
+    setCart(newCart);
+    calcularTotal(newCart);
+    localStorage.setItem('nanocarbon_order', JSON.stringify(newCart));
+  };
+
+  // Función genérica para editar cualquier campo de un item del carrito
+  const editarItem = (id: string, campo: keyof CartItem, valor: string | number) => {
+    const newCart = cart.map(item => {
+      if (item.id === id) {
+        return { ...item, [campo]: valor };
+      }
+      return item;
+    });
+    setCart(newCart);
+    calcularTotal(newCart);
+    localStorage.setItem('nanocarbon_order', JSON.stringify(newCart));
+  };
+
+  const enviarWhatsApp = async () => {
+    setIsSending(true);
+    try {
+      let text = 'Hola Nanocarbon, este es mi pedido:\n\n';
+      cart.forEach((item) => {
+        text += `- ${item.tipo} | ${item.marca} ${item.modelo} | ${item.cantidad} unidades | ${item.material}\n`;
+      });
+      text += `\nTotal de productos: ${totalProductos}`;
+
+      const phone = '3158512091';
+      const encodedText = encodeURIComponent(text);
+      const url = `https://wa.me/57${phone}?text=${encodedText}`;
+      window.open(url, '_blank');
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  if (cart.length === 0) {
+    return (
+      <div className={styles.cartContainer}>
+        <div className={styles.emptyState}>
+          <h2>Tu pedido está vacío</h2>
+          <p>No tienes productos agregados aún.</p>
+          <button className="btn btn-primary" onClick={() => router.push('/order')} style={{ marginTop: '2rem' }}>
+            Ir a agregar productos
+          </button>
+          <button className="btn btn-secondary" onClick={() => router.push('/')} style={{ marginTop: '0.75rem' }}>
+            Volver al Catálogo
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.cartContainer}>
+      <button className={styles.backBtn} onClick={() => router.push('/')}>
+        &larr; Volver al inicio
+      </button>
+
+      <div className={styles.header}>
+        <h2 className={styles.title}>Resumen del Pedido</h2>
+      </div>
+
+      <div className={styles.itemList}>
+        {cart.map((item) => (
+          <div key={item.id} className={styles.item}>
+
+            {/* Nombre del dispositivo */}
+            <div className={styles.itemDetails}>
+              <span className={styles.itemName}>{item.marca} {item.modelo}</span>
+              <span className={styles.itemBadge}>{item.tipo}</span>
+            </div>
+
+            {/* Controles editables */}
+            <div className={styles.itemControls}>
+
+              {/* Selector de Material */}
+              <div className={styles.controlGroup}>
+                <label className={styles.controlLabel}>Material</label>
+                <select
+                  className={styles.controlSelect}
+                  value={item.material}
+                  onChange={(e) => editarItem(item.id, 'material', e.target.value)}
+                >
+                  <option value="Clear">Clear</option>
+                  <option value="Mate">Mate</option>
+                </select>
+              </div>
+
+              {/* Input de Cantidad */}
+              <div className={styles.controlGroup}>
+                <label className={styles.controlLabel}>Cantidad</label>
+                <input
+                  type="number"
+                  className={styles.controlInput}
+                  min="1"
+                  max="500"
+                  value={item.cantidad}
+                  onChange={(e) => editarItem(item.id, 'cantidad', parseInt(e.target.value) || 1)}
+                />
+              </div>
+
+              {/* Botón Eliminar */}
+              <button className={styles.deleteBtn} onClick={() => eliminarItem(item.id)}>
+                ✕
+              </button>
+
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className={styles.summary}>
+        <span>Total unidades requeridas:</span>
+        <span style={{ fontSize: '1.5rem', color: 'var(--accent-color)' }}>{totalProductos}</span>
+      </div>
+
+      <div className={styles.actions}>
+        <button className="btn btn-secondary" onClick={() => router.push('/order')}>
+          + Agregar más productos
+        </button>
+        <button
+          className={`btn ${styles.wppBtn}`}
+          onClick={enviarWhatsApp}
+          disabled={isSending}
+        >
+          {isSending ? 'Procesando...' : '📱 Enviar pedido por WhatsApp'}
+        </button>
+      </div>
+    </div>
+  );
+}

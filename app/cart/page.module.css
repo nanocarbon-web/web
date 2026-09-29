@@ -1,0 +1,189 @@
+.cartContainer {
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  background-color: #0e0e12;
+  border-radius: 24px;
+  padding: 2.5rem;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+  max-width: 640px;
+  margin: 3.5rem auto;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #f5f5f7;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--surface-hover);
+  padding-bottom: 1rem;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 3rem 0;
+  color: var(--text-secondary);
+}
+
+.itemList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.item {
+  background-color: var(--bg-color);
+  padding: 1rem 1.5rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--surface-hover);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: border-color 0.2s ease;
+}
+
+.item:hover {
+  border-color: var(--accent-color);
+}
+
+.itemDetails {
+  display: flex;
+  flex-direction: column;
+}
+
+.itemName {
+  font-weight: 600;
+  font-size: 1.125rem;
+  color: var(--text-primary);
+}
+
+.itemMeta {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.itemBadge {
+  background-color: var(--surface-hover);
+  padding: 0.125rem 0.5rem;
+  border-radius: var(--radius-xl);
+  font-size: 0.75rem;
+  margin-right: 0.5rem;
+}
+
+.itemControls {
+  display: flex;
+  align-items: flex-end;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 0.75rem;
+}
+
+.controlGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.controlLabel {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.controlSelect {
+  padding: 0.4rem 0.6rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--surface-hover);
+  background-color: var(--surface-hover);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  font-family: inherit;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.controlSelect:focus {
+  border-color: var(--accent-color);
+}
+
+.controlInput {
+  width: 70px;
+  padding: 0.4rem 0.6rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--surface-hover);
+  background-color: var(--surface-hover);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  font-family: inherit;
+  outline: none;
+  text-align: center;
+  font-weight: 700;
+  transition: border-color 0.2s ease;
+}
+
+.controlInput:focus {
+  border-color: var(--accent-color);
+}
+
+.deleteBtn {
+  color: var(--danger-color);
+  font-size: 1rem;
+  font-weight: 700;
+  padding: 0.4rem 0.6rem;
+  border-radius: var(--radius-md);
+  transition: background-color 0.2s ease;
+  align-self: flex-end;
+}
+
+.deleteBtn:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+.summary {
+  background-color: var(--bg-color);
+  padding: 1.5rem;
+  border-radius: var(--radius-md);
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 700;
+  font-size: 1.125rem;
+  border: 1px dashed var(--accent-color);
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.backBtn {
+  margin-bottom: 1rem;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+.backBtn:hover {
+  color: var(--text-primary);
+  text-decoration: underline;
+}
+
+.wppBtn {
+  background-color: #25D366; /* Verde WhatsApp */
+  color: white;
+}
+
+.wppBtn:hover {
+  background-color: #128C7E;
+}
