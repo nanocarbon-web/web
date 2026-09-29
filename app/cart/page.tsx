@@ -154,6 +154,7 @@ export default function CartPage() {
                 >
                   <option value="Clear">Clear</option>
                   <option value="Mate">Mate</option>
+                  <option value="AntiEspía">AntiEspía</option>
                 </select>
               </div>
 

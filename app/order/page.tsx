@@ -447,6 +447,17 @@ export default function OrderPage() {
               />
               <span>Mate (Antirreflejo)</span>
             </label>
+            <label className={styles.radioLabel}>
+              <input 
+                type="radio" 
+                name="material" 
+                value="AntiEspía (Privacidad)" 
+                checked={material === 'AntiEspía (Privacidad)'}
+                onChange={(e) => setMaterial(e.target.value)}
+                style={{ accentColor: '#ffffff' }}
+              />
+              <span>AntiEspía (Privacidad)</span>
+            </label>
           </div>
         </div>
 

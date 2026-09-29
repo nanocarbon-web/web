@@ -180,7 +180,7 @@ export default function ModelCatalog() {
       marca: item.brand,
       modelo: item.model,
       cantidad: 1,
-      material: 'Clear NanoCarbon 9H'
+      material: 'Clear'
     };
 
     const cart = JSON.parse(localStorage.getItem('nanocarbon_order') || '[]');
