@@ -5,6 +5,14 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
 import styles from './page.module.css';
 
+interface AutoData {
+  marca?: string;
+  modelo?: string;
+  ano?: string;
+  version?: string;
+  tipoPantalla?: string;
+}
+
 interface CartItem {
   id: string;
   tipo: string;
@@ -12,6 +20,7 @@ interface CartItem {
   modelo: string;
   cantidad: number;
   material: string;
+  autoData?: AutoData;
 }
 
 export default function CartPage() {
@@ -80,12 +89,20 @@ export default function CartPage() {
 
       // 2. Preparar mensaje para WhatsApp (+57 315 851 2091)
       let text = '⚡ *NUEVO PEDIDO NANOCARBÓN®*\n\n';
-      if (clienteNombre.trim()) text += `👤 *Cliente:* ${clienteNombre.trim()}\n`;
+      if (clienteNombre.trim()) text += `👤 *Cliente / Negocio:* ${clienteNombre.trim()}\n`;
       if (clienteCiudad.trim()) text += `📍 *Ciudad:* ${clienteCiudad.trim()}\n`;
       if (clienteTelefono.trim()) text += `📞 *Teléfono:* ${clienteTelefono.trim()}\n`;
       text += `\n📦 *Productos (${totalProductos} unidades):*\n`;
       cart.forEach((item) => {
-        text += `• ${item.tipo} | ${item.marca} ${item.modelo} | ${item.cantidad} und | Acabado ${item.material}\n`;
+        if (item.tipo === 'Automotriz' && item.autoData) {
+          text += `• 🚗 *Vehículo:* ${item.autoData.marca || item.marca} ${item.autoData.modelo || item.modelo}\n`;
+          if (item.autoData.ano) text += `   - Año: ${item.autoData.ano}\n`;
+          if (item.autoData.version) text += `   - Versión: ${item.autoData.version}\n`;
+          if (item.autoData.tipoPantalla) text += `   - Pantalla: ${item.autoData.tipoPantalla}\n`;
+          text += `   - Cantidad: ${item.cantidad} und | Acabado: ${item.material}\n\n`;
+        } else {
+          text += `• ${item.tipo} | ${item.marca} ${item.modelo} | ${item.cantidad} und | Acabado ${item.material}\n`;
+        }
       });
       if (notas.trim()) text += `\n📝 *Notas:* ${notas.trim()}\n`;
 
@@ -137,8 +154,28 @@ export default function CartPage() {
 
             {/* Nombre del dispositivo */}
             <div className={styles.itemDetails}>
-              <span className={styles.itemName}>{item.marca} {item.modelo}</span>
-              <span className={styles.itemBadge}>{item.tipo}</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                <span className={styles.itemName}>{item.marca} {item.modelo}</span>
+                <span className={styles.itemBadge}>{item.tipo}</span>
+              </div>
+              {item.autoData && (
+                <div style={{
+                  marginTop: '0.45rem',
+                  fontSize: '0.8rem',
+                  color: '#a1a1a6',
+                  background: 'rgba(255, 255, 255, 0.04)',
+                  padding: '0.45rem 0.75rem',
+                  borderRadius: '8px',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  gap: '0.75rem'
+                }}>
+                  {item.autoData.ano && <span>📅 <strong>Año:</strong> {item.autoData.ano}</span>}
+                  {item.autoData.version && <span>🏷️ <strong>Versión:</strong> {item.autoData.version}</span>}
+                  {item.autoData.tipoPantalla && <span>📺 <strong>Pantalla:</strong> {item.autoData.tipoPantalla}</span>}
+                </div>
+              )}
             </div>
 
             {/* Controles editables */}

@@ -190,6 +190,13 @@ export default function OrderPage() {
   const [customMarca, setCustomMarca] = useState('');
   const [customModelo, setCustomModelo] = useState('');
 
+  // Automotive specific fields
+  const [autoMarca, setAutoMarca] = useState('');
+  const [autoModelo, setAutoModelo] = useState('');
+  const [autoAno, setAutoAno] = useState('');
+  const [autoVersion, setAutoVersion] = useState('');
+  const [autoTipoPantalla, setAutoTipoPantalla] = useState('Pantalla Central / Infoentretenimiento');
+
   // Quick search
   const [searchFilter, setSearchFilter] = useState('');
 
@@ -218,6 +225,37 @@ export default function OrderPage() {
   }, [modelosDisponibles, searchFilter]);
 
   const handleAgregar = () => {
+    if (tipoSeleccionado === 'Automotriz') {
+      if (!autoMarca.trim() || !autoModelo.trim()) {
+        setError('Por favor indica la marca y el modelo de tu vehículo.');
+        return;
+      }
+
+      const displayModelo = `${autoModelo.trim()}${autoAno.trim() ? ` (${autoAno.trim()})` : ''} - ${autoTipoPantalla}${autoVersion.trim() ? ` [${autoVersion.trim()}]` : ''}`;
+
+      const nuevoProducto = {
+        id: Date.now().toString(),
+        tipo: 'Automotriz',
+        marca: autoMarca.trim(),
+        modelo: displayModelo,
+        autoData: {
+          marca: autoMarca.trim(),
+          modelo: autoModelo.trim(),
+          ano: autoAno.trim(),
+          version: autoVersion.trim(),
+          tipoPantalla: autoTipoPantalla
+        },
+        cantidad: cantidad,
+        material: material
+      };
+
+      const cart = JSON.parse(localStorage.getItem('nanocarbon_order') || '[]');
+      cart.push(nuevoProducto);
+      localStorage.setItem('nanocarbon_order', JSON.stringify(cart));
+      router.push('/cart');
+      return;
+    }
+
     const finalMarca = isCustom ? customMarca.trim() : (marcaSeleccionada || currentMarca?.nombre);
     const finalModelo = isCustom ? customModelo.trim() : (modeloSeleccionado || filteredModelos[0]);
 
@@ -317,113 +355,221 @@ export default function OrderPage() {
           </div>
         </div>
 
-        {/* Switcher Manual vs Lista */}
-        <div style={{ marginBottom: '1.5rem', textAlign: 'right' }}>
-          <button 
-            type="button"
-            onClick={() => {
-              setIsCustom(!isCustom);
-              setError('');
-            }}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: '#2997ff',
-              textDecoration: 'underline',
-              cursor: 'pointer',
-              fontSize: '0.85rem',
-              fontWeight: 500,
-            }}
-          >
-            {isCustom ? "Seleccionar desde la lista" : "¿No encuentras tu modelo? Escríbelo manualmente"}
-          </button>
-        </div>
-
-        {isCustom ? (
-          <>
-            <div className={styles.formGroup}>
-              <label>Marca (Manual)</label>
-              <input 
-                type="text" 
-                className={styles.input} 
-                placeholder="Ej. Samsung, Apple, Xiaomi..."
-                value={customMarca} 
-                onChange={(e) => setCustomMarca(e.target.value)}
-              />
-            </div>
-            <div className={styles.formGroup}>
-              <label>Modelo exacto (Manual)</label>
-              <input 
-                type="text" 
-                className={styles.input} 
-                placeholder="Ej. Galaxy A54 5G, iPad Air 5..."
-                value={customModelo} 
-                onChange={(e) => setCustomModelo(e.target.value)}
-              />
-            </div>
-          </>
-        ) : (
-          <>
-            {/* Brand Dropdown - 100% Visible with High Contrast */}
-            <div className={styles.formGroup}>
-              <label>2. Marca</label>
-              <select 
-                className={styles.select} 
-                value={marcaSeleccionada} 
-                onChange={(e) => {
-                  setMarca(e.target.value);
-                  setModelo('');
-                  setError('');
-                }}
-              >
-                {marcasDisponibles.map((m, i) => (
-                  <option key={i} value={m.nombre} style={{ backgroundColor: '#141418', color: '#ffffff' }}>
-                    {m.nombre}
-                  </option>
-                ))}
-              </select>
+        {tipoSeleccionado === 'Automotriz' ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', marginBottom: '1.5rem' }}>
+            <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '1rem', borderRadius: '14px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+              <p style={{ margin: 0, fontSize: '0.85rem', color: '#a1a1a6' }}>
+                🚗 Ingresa los datos de tu vehículo para cortar el protector a la medida exacta de tu pantalla o clúster.
+              </p>
             </div>
 
-            {/* Model Dropdown - 100% Visible with High Contrast */}
+            {/* Marca del Vehículo */}
             <div className={styles.formGroup}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
-                <label style={{ margin: 0 }}>3. Modelo Exacto</label>
-                <span style={{ fontSize: '0.78rem', color: '#86868b' }}>
-                  {filteredModelos.length} opciones disponibles
-                </span>
-              </div>
-
-              {/* Quick filter input for models */}
+              <label>2. Marca del Vehículo</label>
               <input
                 type="text"
                 className={styles.input}
-                placeholder="Escribe para filtrar tu modelo (ej. S23, iPhone 11, Note 8...)"
-                value={searchFilter}
-                onChange={(e) => setSearchFilter(e.target.value)}
-                style={{ marginBottom: '0.6rem', padding: '0.65rem 1rem', fontSize: '0.88rem' }}
-              />
-
-              <select 
-                className={styles.select} 
-                value={modeloSeleccionado || filteredModelos[0] || ''} 
+                placeholder="Ej. Toyota, Mazda, Chevrolet, Ford, Renault, BYD..."
+                value={autoMarca}
                 onChange={(e) => {
-                  setModelo(e.target.value);
+                  setAutoMarca(e.target.value);
                   setError('');
                 }}
+                list="marcas-autos"
+              />
+              <datalist id="marcas-autos">
+                <option value="Toyota" />
+                <option value="Mazda" />
+                <option value="Chevrolet" />
+                <option value="Renault" />
+                <option value="Kia" />
+                <option value="Ford" />
+                <option value="Nissan" />
+                <option value="Hyundai" />
+                <option value="Volkswagen" />
+                <option value="BMW" />
+                <option value="Mercedes-Benz" />
+                <option value="BYD" />
+                <option value="Suzuki" />
+                <option value="Honda" />
+                <option value="Jeep" />
+              </datalist>
+            </div>
+
+            {/* Modelo o Línea del Vehículo */}
+            <div className={styles.formGroup}>
+              <label>3. Modelo o Línea del Vehículo</label>
+              <input
+                type="text"
+                className={styles.input}
+                placeholder="Ej. Hilux, CX-30, Tracker, Duster, Picanto, Ranger, Prado..."
+                value={autoModelo}
+                onChange={(e) => {
+                  setAutoModelo(e.target.value);
+                  setError('');
+                }}
+              />
+            </div>
+
+            {/* Grid de Año de Fabricación y Versión */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem' }}>
+              <div className={styles.formGroup}>
+                <label>4. Año de Fabricación</label>
+                <input
+                  type="text"
+                  className={styles.input}
+                  placeholder="Ej. 2024, 2023, 2022..."
+                  value={autoAno}
+                  onChange={(e) => setAutoAno(e.target.value)}
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>5. Versión o Edición</label>
+                <input
+                  type="text"
+                  className={styles.input}
+                  placeholder="Ej. Touring, High Country, GT..."
+                  value={autoVersion}
+                  onChange={(e) => setAutoVersion(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* Tipo de Pantalla a Proteger */}
+            <div className={styles.formGroup}>
+              <label>6. Pantalla a Proteger</label>
+              <select
+                className={styles.select}
+                value={autoTipoPantalla}
+                onChange={(e) => setAutoTipoPantalla(e.target.value)}
               >
-                {filteredModelos.map((mod, i) => (
-                  <option key={i} value={mod} style={{ backgroundColor: '#141418', color: '#ffffff' }}>
-                    {mod}
-                  </option>
-                ))}
+                <option value="Pantalla Central / Infoentretenimiento" style={{ backgroundColor: '#141418', color: '#ffffff' }}>
+                  Pantalla Central / Infoentretenimiento
+                </option>
+                <option value="Clúster Digital (Tacómetro / Tablero)" style={{ backgroundColor: '#141418', color: '#ffffff' }}>
+                  Clúster Digital (Tacómetro / Tablero)
+                </option>
+                <option value="Kit Completo (Pantalla Central + Clúster)" style={{ backgroundColor: '#141418', color: '#ffffff' }}>
+                  Kit Completo (Pantalla Central + Clúster)
+                </option>
+                <option value="Pantalla Trasera / Pasajeros" style={{ backgroundColor: '#141418', color: '#ffffff' }}>
+                  Pantalla Trasera / Pasajeros
+                </option>
               </select>
             </div>
+          </div>
+        ) : (
+          <>
+            {/* Switcher Manual vs Lista */}
+            <div style={{ marginBottom: '1.5rem', textAlign: 'right' }}>
+              <button 
+                type="button"
+                onClick={() => {
+                  setIsCustom(!isCustom);
+                  setError('');
+                }}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#2997ff',
+                  textDecoration: 'underline',
+                  cursor: 'pointer',
+                  fontSize: '0.85rem',
+                  fontWeight: 500,
+                }}
+              >
+                {isCustom ? "Seleccionar desde la lista" : "¿No encuentras tu modelo? Escríbelo manualmente"}
+              </button>
+            </div>
+
+            {isCustom ? (
+              <>
+                <div className={styles.formGroup}>
+                  <label>Marca (Manual)</label>
+                  <input 
+                    type="text" 
+                    className={styles.input} 
+                    placeholder="Ej. Samsung, Apple, Xiaomi..."
+                    value={customMarca} 
+                    onChange={(e) => setCustomMarca(e.target.value)}
+                  />
+                </div>
+                <div className={styles.formGroup}>
+                  <label>Modelo exacto (Manual)</label>
+                  <input 
+                    type="text" 
+                    className={styles.input} 
+                    placeholder="Ej. Galaxy A54 5G, iPad Air 5..."
+                    value={customModelo} 
+                    onChange={(e) => setCustomModelo(e.target.value)}
+                  />
+                </div>
+              </>
+            ) : (
+              <>
+                {/* Brand Dropdown - 100% Visible with High Contrast */}
+                <div className={styles.formGroup}>
+                  <label>2. Marca</label>
+                  <select 
+                    className={styles.select} 
+                    value={marcaSeleccionada} 
+                    onChange={(e) => {
+                      setMarca(e.target.value);
+                      setModelo('');
+                      setError('');
+                    }}
+                  >
+                    {marcasDisponibles.map((m, i) => (
+                      <option key={i} value={m.nombre} style={{ backgroundColor: '#141418', color: '#ffffff' }}>
+                        {m.nombre}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Model Dropdown - 100% Visible with High Contrast */}
+                <div className={styles.formGroup}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
+                    <label style={{ margin: 0 }}>3. Modelo Exacto</label>
+                    <span style={{ fontSize: '0.78rem', color: '#86868b' }}>
+                      {filteredModelos.length} opciones disponibles
+                    </span>
+                  </div>
+
+                  {/* Quick filter input for models */}
+                  <input
+                    type="text"
+                    className={styles.input}
+                    placeholder="Escribe para filtrar tu modelo (ej. S23, iPhone 11, Note 8...)"
+                    value={searchFilter}
+                    onChange={(e) => setSearchFilter(e.target.value)}
+                    style={{ marginBottom: '0.6rem', padding: '0.65rem 1rem', fontSize: '0.88rem' }}
+                  />
+
+                  <select 
+                    className={styles.select} 
+                    value={modeloSeleccionado || filteredModelos[0] || ''} 
+                    onChange={(e) => {
+                      setModelo(e.target.value);
+                      setError('');
+                    }}
+                  >
+                    {filteredModelos.map((mod, i) => (
+                      <option key={i} value={mod} style={{ backgroundColor: '#141418', color: '#ffffff' }}>
+                        {mod}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </>
+            )}
           </>
         )}
 
         {/* Material Selection */}
         <div className={styles.formGroup}>
-          <label>4. Acabado del Protector</label>
+          <label>{tipoSeleccionado === 'Automotriz' ? '7. Acabado del Protector' : '4. Acabado del Protector'}</label>
           <div className={styles.radioGroup}>
             <label className={styles.radioLabel}>
               <input 
@@ -463,7 +609,7 @@ export default function OrderPage() {
 
         {/* Quantity */}
         <div className={styles.formGroup}>
-          <label>5. Cantidad</label>
+          <label>{tipoSeleccionado === 'Automotriz' ? '8. Cantidad' : '5. Cantidad'}</label>
           <input 
             type="number" 
             min="1" 
