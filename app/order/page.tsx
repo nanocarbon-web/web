@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { fetchLiveDatabase } from '@/lib/catalogDatabase';
+import { AUTOMOTIVE_DATABASE } from '@/lib/automotiveDatabase';
 import styles from './page.module.css';
 
 interface Marca {
@@ -157,17 +158,7 @@ const DEFAULT_DATABASE: Categoria[] = [
   },
   {
     tipo: 'Automotriz',
-    marcas: [
-      {
-        nombre: 'Pantallas Vehiculares',
-        modelos: [
-          'Consola Central Táctil Universal 7 pulgadas',
-          'Consola Central Táctil Universal 9 pulgadas',
-          'Consola Central Táctil Universal 10 pulgadas',
-          'Clúster Digital de Instrumentos (Corte Especial)',
-        ]
-      }
-    ]
+    marcas: AUTOMOTIVE_DATABASE
   }
 ];
 
@@ -205,8 +196,16 @@ export default function OrderPage() {
     fetchLiveDatabase()
       .then(data => {
         if (data && Array.isArray(data) && data.length > 0) {
-          // Merge with default database
-          setDb(data);
+          const merged = [...data];
+          DEFAULT_DATABASE.forEach(defCat => {
+            const existing = merged.find(c => c.tipo.toLowerCase() === defCat.tipo.toLowerCase());
+            if (!existing) {
+              merged.push(defCat);
+            } else if (defCat.tipo.toLowerCase() === 'automotriz') {
+              existing.marcas = defCat.marcas;
+            }
+          });
+          setDb(merged);
         }
       })
       .catch(() => {
@@ -214,7 +213,9 @@ export default function OrderPage() {
       });
   }, []);
 
-  const currentCategoria = db.find(c => c.tipo.toLowerCase() === tipoSeleccionado.toLowerCase()) || db[0];
+  const currentCategoria = tipoSeleccionado.toLowerCase() === 'automotriz'
+    ? { tipo: 'Automotriz', marcas: AUTOMOTIVE_DATABASE }
+    : (db.find(c => c.tipo.toLowerCase() === tipoSeleccionado.toLowerCase()) || db[0]);
   const marcasDisponibles = currentCategoria ? currentCategoria.marcas : [];
   const currentMarca = marcasDisponibles.find(m => m.nombre.toLowerCase() === marcaSeleccionada.toLowerCase()) || marcasDisponibles[0];
   const modelosDisponibles = currentMarca ? currentMarca.modelos : [];
@@ -340,10 +341,16 @@ export default function OrderPage() {
                   className={`${styles.typeBtn} ${active ? styles.typeBtnActive : ''}`}
                   onClick={() => {
                     setTipo(tipo);
-                    const cat = db.find(c => c.tipo.toLowerCase() === tipo.toLowerCase());
-                    if (cat && cat.marcas.length > 0) {
-                      setMarca(cat.marcas[0].nombre);
-                      setModelo(cat.marcas[0].modelos[0] || '');
+                    if (tipo === 'Automotriz') {
+                      setAutoMarca('Mercedes-Benz');
+                      const mb = AUTOMOTIVE_DATABASE.find(b => b.nombre === 'Mercedes-Benz');
+                      setAutoModelo(mb?.modelos[0] || '');
+                    } else {
+                      const cat = db.find(c => c.tipo.toLowerCase() === tipo.toLowerCase());
+                      if (cat && cat.marcas.length > 0) {
+                        setMarca(cat.marcas[0].nombre);
+                        setModelo(cat.marcas[0].modelos[0] || '');
+                      }
                     }
                     setError('');
                   }}
@@ -359,50 +366,54 @@ export default function OrderPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', marginBottom: '1.5rem' }}>
             <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '1rem', borderRadius: '14px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
               <p style={{ margin: 0, fontSize: '0.85rem', color: '#a1a1a6' }}>
-                🚗 Ingresa los datos de tu vehículo para cortar el protector a la medida exacta de tu pantalla o clúster.
+                🚗 Selecciona la marca y modelo de tu vehículo para cortar el protector a la medida exacta de tu pantalla o clúster.
               </p>
             </div>
 
             {/* Marca del Vehículo */}
             <div className={styles.formGroup}>
               <label>2. Marca del Vehículo</label>
-              <input
-                type="text"
-                className={styles.input}
-                placeholder="Ej. Toyota, Mazda, Chevrolet, Ford, Renault, BYD..."
-                value={autoMarca}
+              <select
+                className={styles.select}
+                value={autoMarca || 'Mercedes-Benz'}
                 onChange={(e) => {
-                  setAutoMarca(e.target.value);
+                  const nuevaMarca = e.target.value;
+                  setAutoMarca(nuevaMarca);
+                  const found = AUTOMOTIVE_DATABASE.find(b => b.nombre === nuevaMarca);
+                  setAutoModelo(found ? found.modelos[0] : '');
                   setError('');
                 }}
-                list="marcas-autos"
-              />
-              <datalist id="marcas-autos">
-                <option value="Toyota" />
-                <option value="Mazda" />
-                <option value="Chevrolet" />
-                <option value="Renault" />
-                <option value="Kia" />
-                <option value="Ford" />
-                <option value="Nissan" />
-                <option value="Hyundai" />
-                <option value="Volkswagen" />
-                <option value="BMW" />
-                <option value="Mercedes-Benz" />
-                <option value="BYD" />
-                <option value="Suzuki" />
-                <option value="Honda" />
-                <option value="Jeep" />
-              </datalist>
+              >
+                {AUTOMOTIVE_DATABASE.map((b, i) => (
+                  <option key={i} value={b.nombre} style={{ backgroundColor: '#141418', color: '#ffffff' }}>
+                    {b.nombre}
+                  </option>
+                ))}
+              </select>
             </div>
 
             {/* Modelo o Línea del Vehículo */}
             <div className={styles.formGroup}>
               <label>3. Modelo o Línea del Vehículo</label>
+              <select
+                className={styles.select}
+                value={autoModelo}
+                onChange={(e) => {
+                  setAutoModelo(e.target.value);
+                  setError('');
+                }}
+              >
+                {(AUTOMOTIVE_DATABASE.find(b => b.nombre === (autoMarca || 'Mercedes-Benz'))?.modelos || []).map((mod, i) => (
+                  <option key={i} value={mod} style={{ backgroundColor: '#141418', color: '#ffffff' }}>
+                    {mod}
+                  </option>
+                ))}
+              </select>
               <input
                 type="text"
                 className={styles.input}
-                placeholder="Ej. Hilux, CX-30, Tracker, Duster, Picanto, Ranger, Prado..."
+                style={{ marginTop: '0.6rem' }}
+                placeholder="O escribe aquí si es otra versión o modelo..."
                 value={autoModelo}
                 onChange={(e) => {
                   setAutoModelo(e.target.value);
