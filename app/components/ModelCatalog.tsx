@@ -11,6 +11,7 @@ import {
   SlidersHorizontal
 } from 'lucide-react';
 import { fetchLiveDatabase } from '@/lib/catalogDatabase';
+import { AUTOMOTIVE_DATABASE } from '@/lib/automotiveDatabase';
 
 interface DeviceItem {
   brand: string;
@@ -18,7 +19,16 @@ interface DeviceItem {
   model: string;
 }
 
+const AUTOMOTIVE_ITEMS: DeviceItem[] = AUTOMOTIVE_DATABASE.flatMap(marca =>
+  marca.modelos.map(mod => ({
+    brand: marca.nombre,
+    category: 'Automotriz' as const,
+    model: mod,
+  }))
+);
+
 const DOCX_MODELS: DeviceItem[] = [
+  ...AUTOMOTIVE_ITEMS,
   // iPhone
   { brand: 'Apple', category: 'Celular', model: 'iPhone 15 Pro Max' },
   { brand: 'Apple', category: 'Celular', model: 'iPhone 15 Pro' },
@@ -160,15 +170,23 @@ export default function ModelCatalog() {
   }, []);
 
   const brands = useMemo(() => {
-    return ['Todos', 'Apple', 'Samsung', 'Xiaomi', 'Motorola', 'Huawei', 'Honor', 'Lenovo', 'Automotriz'];
+    return ['Todos', 'Automotriz', 'Toyota', 'Mazda', 'Chevrolet', 'BYD', 'Tesla', 'Apple', 'Samsung', 'Xiaomi', 'Motorola'];
   }, []);
 
   const filteredModels = useMemo(() => {
     return allModels.filter(item => {
-      const matchBrand = selectedBrand === 'Todos' || item.brand.toLowerCase() === selectedBrand.toLowerCase();
-      const matchSearch = searchQuery.trim() === '' || 
-        item.model.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.brand.toLowerCase().includes(searchQuery.toLowerCase());
+      let matchBrand = true;
+      if (selectedBrand === 'Automotriz') {
+        matchBrand = item.category === 'Automotriz';
+      } else if (selectedBrand !== 'Todos') {
+        matchBrand = item.brand.toLowerCase() === selectedBrand.toLowerCase();
+      }
+
+      const q = searchQuery.toLowerCase().trim();
+      const matchSearch = q === '' || 
+        item.model.toLowerCase().includes(q) ||
+        item.brand.toLowerCase().includes(q) ||
+        item.category.toLowerCase().includes(q);
       return matchBrand && matchSearch;
     });
   }, [allModels, selectedBrand, searchQuery]);

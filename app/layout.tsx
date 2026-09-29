@@ -6,21 +6,27 @@ const SITE_URL = 'https://nanocarbon.pages.dev';
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: 'NanoCarbón® Colombia | Película de Polímero en Carbón',
+    default: 'Protector de Pantalla para Carros y Pantallas Digitales | NanoCarbón® Colombia',
     template: '%s | NanoCarbón®',
   },
-  description: 'Película protectora de polímero en carbón molecular para celulares, tablets y pantallas de carros. Absorbe impactos mecánicos, nunca se astilla, dureza 9H y acabados Clear, Mate y AntiEspía.',
+  description: 'Protectores de alta resistencia para pantallas de carros, tableros digitales de infoentretenimiento, celulares y tablets. Polímero en carbón molecular que absorbe impactos mecánicos, nunca se astilla, dureza 9H y acabados Clear y Mate Antirreflejo.',
   keywords: [
+    'protector de pantalla para carros',
+    'protectores para pantallas digitales',
+    'protector pantalla autos colombia',
+    'protector pantalla tactil carro',
+    'protector pantalla infoentretenimiento',
+    'lamina pantalla vehiculos',
+    'protector pantalla toyota hilux',
+    'protector pantalla mazda cx-30',
+    'protector pantalla byd',
+    'protector pantalla chevrolet tracker',
     'NanoCarbon',
     'NanoCarbon Colombia',
     'pelicula de polimero en carbon',
     'protector de pantalla colombia',
-    'protector pantalla vehiculos',
-    'protector pantalla toyota hilux',
-    'protector pantalla mazda cx-30',
     'protector pantalla iphone antiespia',
     'protector pantalla samsung',
-    'pantallas vehiculares colombia',
     'mas accesorios sas'
   ],
   authors: [{ name: 'Mas Accesorios SAS' }],
@@ -130,6 +136,36 @@ const jsonLd = {
         'ratingValue': '4.9',
         'reviewCount': '128',
       },
+    },
+    {
+      '@type': 'FAQPage',
+      '@id': 'https://nanocarbon.pages.dev/#faq',
+      'mainEntity': [
+        {
+          '@type': 'Question',
+          'name': '¿Cuál es el mejor protector de pantalla para carros y pantallas digitales?',
+          'acceptedAnswer': {
+            '@type': 'Answer',
+            'text': 'La película protectora de polímero en carbón molecular NanoCarbón® es la mejor opción para pantallas de automóviles y pantallas digitales táctiles. A diferencia del vidrio templado que se astilla por la radiación solar y vibraciones, NanoCarbón absorbe impactos mecánicos, nunca se quiebra y ofrece acabado Mate Antirreflejo para eliminar destellos solares al conducir.'
+          }
+        },
+        {
+          '@type': 'Question',
+          'name': '¿Tienen protectores de pantalla para marcas como Toyota, Mazda, BYD y Chevrolet?',
+          'acceptedAnswer': {
+            '@type': 'Answer',
+            'text': 'Sí. Contamos con corte computarizado a la medida exacta para centros de infoentretenimiento y clúster digital de Toyota (Hilux, Corolla Cross, Prado), Mazda (CX-30, Mazda 3), BYD (Song Plus, Dolphin), Chevrolet (Tracker, Onix), Tesla, BMW, Mercedes-Benz y pantallas universales.'
+          }
+        },
+        {
+          '@type': 'Question',
+          'name': '¿El protector para carro altera la sensibilidad táctil o la visibilidad?',
+          'acceptedAnswer': {
+            '@type': 'Answer',
+            'text': 'No. Mantiene la respuesta táctil instantánea con 0 latencia y ofrece 99.8% de claridad óptica sin distorsión de color.'
+          }
+        }
+      ]
     },
   ],
 };

@@ -23,6 +23,11 @@ export default function Hero() {
           textAlign: 'center',
         }}
       >
+        {/* Semantic SEO Badge */}
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.35rem 1rem', borderRadius: '999px', background: 'rgba(255, 255, 255, 0.06)', border: '1px solid rgba(255, 255, 255, 0.12)', fontSize: '0.82rem', fontWeight: 600, color: '#a1a1a6', marginBottom: '1.25rem' }}>
+          <span>Protectores para Pantallas de Carros, Pantallas Digitales & Celulares</span>
+        </div>
+
         {/* Apple Headline */}
         <h1 className="apple-headline" style={{ marginBottom: '1rem' }}>
           NanoCarbón.
@@ -33,8 +38,8 @@ export default function Hero() {
           <span style={{ color: '#86868b' }}>Infundido con carbono molecular.</span>
         </p>
 
-        <p className="apple-lead" style={{ maxWidth: '640px', margin: '0 auto 2.5rem' }}>
-          Película protectora de polímero en carbón de alta definición. Absorbe impactos mecánicos, nunca se astilla y ofrece dureza 9H con transparencia absoluta.
+        <p className="apple-lead" style={{ maxWidth: '680px', margin: '0 auto 2.5rem' }}>
+          Láminas de polímero en carbón molecular para pantallas de carros, centros de infoentretenimiento táctil, clúster digital y smartphones. Absorbe impactos mecánicos, nunca se astilla y ofrece dureza 9H con acabados Clear y Mate Antirreflejo.
         </p>
 
         {/* Apple CTAs */}
