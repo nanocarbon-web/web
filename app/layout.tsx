@@ -47,18 +47,19 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: '/hero-render.jpg',
-        width: 1200,
-        height: 630,
-        alt: 'NanoCarbón® Película de Polímero en Carbón',
+        url: '/logo-whatsapp.jpg',
+        width: 800,
+        height: 800,
+        alt: 'Logo NanoCarbón®',
+        type: 'image/jpeg',
       },
     ],
   },
   twitter: {
-    card: 'summary_large_image',
+    card: 'summary',
     title: 'NanoCarbón® | Película de Polímero en Carbón',
     description: 'Protector de pantalla en polímero molecular para celulares y pantallas de automóviles. Envíos en Colombia.',
-    images: ['/hero-render.jpg'],
+    images: ['/logo-whatsapp.jpg'],
   },
   icons: {
     icon: '/logo-2026.jpg',
@@ -179,6 +180,11 @@ export default function RootLayout({
     <html lang="es">
       <head>
         <meta name="google-site-verification" content="QZvzliqYaYSWK5AdXQaQCCslzuwmtL9Xqz--FQXEzG0" />
+        <meta property="og:image" content={`${SITE_URL}/logo-whatsapp.jpg`} />
+        <meta property="og:image:secure_url" content={`${SITE_URL}/logo-whatsapp.jpg`} />
+        <meta property="og:image:type" content="image/jpeg" />
+        <meta property="og:image:width" content="800" />
+        <meta property="og:image:height" content="800" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
