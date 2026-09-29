@@ -1,13 +1,5 @@
 import './globals.css';
 import type { Metadata } from 'next';
-import { Plus_Jakarta_Sans } from 'next/font/google';
-
-const jakarta = Plus_Jakarta_Sans({
-  subsets: ['latin'],
-  display: 'swap',
-  weight: ['400', '500', '600', '700', '800'],
-  variable: '--font-sans',
-});
 
 const SITE_URL = 'https://nanocarbon.pages.dev';
 
@@ -140,7 +132,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es" className={jakarta.variable}>
+    <html lang="es">
       <head>
         <meta name="google-site-verification" content="QZvzliqYaYSWK5AdXQaQCCslzuwmtL9Xqz--FQXEzG0" />
         <script
@@ -148,7 +140,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className={jakarta.className}>
+      <body>
         {children}
       </body>
     </html>
