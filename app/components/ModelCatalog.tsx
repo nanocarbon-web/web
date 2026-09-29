@@ -10,6 +10,7 @@ import {
   ArrowRight,
   SlidersHorizontal
 } from 'lucide-react';
+import { fetchLiveDatabase } from '@/lib/catalogDatabase';
 
 interface DeviceItem {
   brand: string;
@@ -112,12 +113,11 @@ export default function ModelCatalog() {
   const [selectedBrand, setSelectedBrand] = useState('Todos');
   const [allModels, setAllModels] = useState<DeviceItem[]>(DOCX_MODELS);
 
-  // Sync with live /api/database
+  // Sync with live Google Sheets catalog
   useEffect(() => {
-    fetch('/api/database')
-      .then(res => res.json())
+    fetchLiveDatabase()
       .then(data => {
-        if (Array.isArray(data) && data.length > 0) {
+        if (data && Array.isArray(data) && data.length > 0) {
           const apiDevices: DeviceItem[] = [];
           data.forEach(cat => {
             const catType = cat.tipo?.toLowerCase().includes('tablet') 

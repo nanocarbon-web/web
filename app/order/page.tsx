@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { fetchLiveDatabase } from '@/lib/catalogDatabase';
 import styles from './page.module.css';
 
 interface Marca {
@@ -194,13 +195,9 @@ export default function OrderPage() {
 
   useEffect(() => {
     // Attempt live sync from Google Sheet
-    fetch('/api/database')
-      .then(res => {
-        if (!res.ok) throw new Error('Error');
-        return res.json();
-      })
+    fetchLiveDatabase()
       .then(data => {
-        if (Array.isArray(data) && data.length > 0) {
+        if (data && Array.isArray(data) && data.length > 0) {
           // Merge with default database
           setDb(data);
         }
