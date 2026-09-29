@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabaseClient';
 import styles from './page.module.css';
 
 interface CartItem {
@@ -18,6 +19,10 @@ export default function CartPage() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [totalProductos, setTotalProductos] = useState(0);
   const [isSending, setIsSending] = useState(false);
+  const [clienteNombre, setClienteNombre] = useState('');
+  const [clienteTelefono, setClienteTelefono] = useState('');
+  const [clienteCiudad, setClienteCiudad] = useState('');
+  const [notas, setNotas] = useState('');
 
   useEffect(() => {
     const savedOrder = localStorage.getItem('nanocarbon_order');
@@ -56,16 +61,42 @@ export default function CartPage() {
   const enviarWhatsApp = async () => {
     setIsSending(true);
     try {
-      let text = 'Hola Nanocarbon, este es mi pedido:\n\n';
+      // 1. Guardar automáticamente en Supabase
+      try {
+        await supabase.from('pedidos').insert([
+          {
+            cliente_nombre: clienteNombre.trim() || 'Cliente Web',
+            cliente_telefono: clienteTelefono.trim() || '',
+            cliente_ciudad: clienteCiudad.trim() || '',
+            items: cart,
+            total: totalProductos,
+            notas: notas.trim() || '',
+            estado: 'pendiente'
+          }
+        ]);
+      } catch (err) {
+        console.warn('Error guardando en Supabase:', err);
+      }
+
+      // 2. Preparar mensaje para WhatsApp (+57 315 851 2091)
+      let text = '⚡ *NUEVO PEDIDO NANOCARBÓN®*\n\n';
+      if (clienteNombre.trim()) text += `👤 *Cliente:* ${clienteNombre.trim()}\n`;
+      if (clienteCiudad.trim()) text += `📍 *Ciudad:* ${clienteCiudad.trim()}\n`;
+      if (clienteTelefono.trim()) text += `📞 *Teléfono:* ${clienteTelefono.trim()}\n`;
+      text += `\n📦 *Productos (${totalProductos} unidades):*\n`;
       cart.forEach((item) => {
-        text += `- ${item.tipo} | ${item.marca} ${item.modelo} | ${item.cantidad} unidades | ${item.material}\n`;
+        text += `• ${item.tipo} | ${item.marca} ${item.modelo} | ${item.cantidad} und | Acabado ${item.material}\n`;
       });
-      text += `\nTotal de productos: ${totalProductos}`;
+      if (notas.trim()) text += `\n📝 *Notas:* ${notas.trim()}\n`;
 
       const phone = '3158512091';
       const encodedText = encodeURIComponent(text);
       const url = `https://wa.me/57${phone}?text=${encodedText}`;
+      
+      localStorage.removeItem('nanocarbon_order');
       window.open(url, '_blank');
+      setCart([]);
+      setTotalProductos(0);
     } catch (e) {
       console.error(e);
     } finally {
@@ -147,6 +178,43 @@ export default function CartPage() {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Datos del Cliente */}
+      <div className={styles.clientForm}>
+        <div className={styles.formTitle}>Datos de Entrega / Contacto</div>
+        <div className={styles.formGrid}>
+          <input
+            type="text"
+            className={styles.formInput}
+            placeholder="Nombre o Nombre del Negocio"
+            value={clienteNombre}
+            onChange={(e) => setClienteNombre(e.target.value)}
+          />
+          <input
+            type="text"
+            className={styles.formInput}
+            placeholder="Ciudad / Municipio"
+            value={clienteCiudad}
+            onChange={(e) => setClienteCiudad(e.target.value)}
+          />
+        </div>
+        <div className={styles.formGrid}>
+          <input
+            type="tel"
+            className={styles.formInput}
+            placeholder="Teléfono / WhatsApp de contacto"
+            value={clienteTelefono}
+            onChange={(e) => setClienteTelefono(e.target.value)}
+          />
+          <input
+            type="text"
+            className={styles.formInput}
+            placeholder="Notas u observaciones (opcional)"
+            value={notas}
+            onChange={(e) => setNotas(e.target.value)}
+          />
+        </div>
       </div>
 
       <div className={styles.summary}>
