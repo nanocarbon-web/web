@@ -31,6 +31,7 @@ export default function CartPage() {
   const [clienteNombre, setClienteNombre] = useState('');
   const [clienteTelefono, setClienteTelefono] = useState('');
   const [clienteCiudad, setClienteCiudad] = useState('');
+  const [clienteDireccion, setClienteDireccion] = useState('');
   const [notas, setNotas] = useState('');
 
   useEffect(() => {
@@ -77,6 +78,7 @@ export default function CartPage() {
             cliente_nombre: clienteNombre.trim() || 'Cliente Web',
             cliente_telefono: clienteTelefono.trim() || '',
             cliente_ciudad: clienteCiudad.trim() || '',
+            cliente_direccion: clienteDireccion.trim() || '',
             items: cart,
             total: totalProductos,
             notas: notas.trim() || '',
@@ -87,24 +89,55 @@ export default function CartPage() {
         console.warn('Error guardando en Supabase:', err);
       }
 
-      // 2. Preparar mensaje para WhatsApp (+57 315 851 2091)
-      let text = '⚡ *NUEVO PEDIDO NANOCARBÓN®*\n\n';
-      if (clienteNombre.trim()) text += `👤 *Cliente / Negocio:* ${clienteNombre.trim()}\n`;
-      if (clienteCiudad.trim()) text += `📍 *Ciudad:* ${clienteCiudad.trim()}\n`;
-      if (clienteTelefono.trim()) text += `📞 *Teléfono:* ${clienteTelefono.trim()}\n`;
-      text += `\n📦 *Productos (${totalProductos} unidades):*\n`;
-      cart.forEach((item) => {
+      // 2. Preparar mensaje ejecutivo para WhatsApp (+57 315 851 2091)
+      const fechaActual = new Date().toLocaleDateString('es-CO', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+
+      let text = '━━━━━━━━━━━━━━━━━━━━\n';
+      text += '🛡️ *NANOCARBÓN® COLOMBIA*\n';
+      text += '    _Orden de Pedido Oficial_\n';
+      text += '━━━━━━━━━━━━━━━━━━━━\n\n';
+
+      text += '📋 *DATOS DE DESPACHO:*\n';
+      text += `• *Cliente:* ${clienteNombre.trim() || 'Cliente Web'}\n`;
+      text += `• *Ciudad:* ${clienteCiudad.trim() || 'Por coordinar'}\n`;
+      if (clienteDireccion.trim()) text += `• *Dirección:* ${clienteDireccion.trim()}\n`;
+      text += `• *Teléfono:* ${clienteTelefono.trim() || 'No especificado'}\n`;
+      text += `• *Fecha:* ${fechaActual}\n\n`;
+
+      text += '📦 *ITEMS SOLICITADOS:*\n';
+      text += '────────────────────\n';
+      cart.forEach((item, index) => {
+        const num = index + 1;
         if (item.tipo === 'Automotriz' && item.autoData) {
-          text += `• 🚗 *Vehículo:* ${item.autoData.marca || item.marca} ${item.autoData.modelo || item.modelo}\n`;
-          if (item.autoData.ano) text += `   - Año: ${item.autoData.ano}\n`;
-          if (item.autoData.version) text += `   - Versión: ${item.autoData.version}\n`;
-          if (item.autoData.tipoPantalla) text += `   - Pantalla: ${item.autoData.tipoPantalla}\n`;
-          text += `   - Cantidad: ${item.cantidad} und | Acabado: ${item.material}\n\n`;
+          text += `${num}️⃣ *${item.autoData.marca || item.marca} ${item.autoData.modelo || item.modelo}*\n`;
+          text += `   • Categoría: 🚗 Automotriz\n`;
+          if (item.autoData.tipoPantalla) text += `   • Pantalla: ${item.autoData.tipoPantalla}\n`;
+          if (item.autoData.ano) text += `   • Año: ${item.autoData.ano}\n`;
+          if (item.autoData.version) text += `   • Versión: ${item.autoData.version}\n`;
+          text += `   • Acabado: ${item.material}\n`;
+          text += `   • Cantidad: *${item.cantidad} ${item.cantidad === 1 ? 'unidad' : 'unidades'}*\n\n`;
         } else {
-          text += `• ${item.tipo} | ${item.marca} ${item.modelo} | ${item.cantidad} und | Acabado ${item.material}\n`;
+          text += `${num}️⃣ *${item.marca} ${item.modelo}*\n`;
+          text += `   • Categoría: ${item.tipo === 'Tablet' ? '📟 Tablet' : '📱 Celular'}\n`;
+          text += `   • Acabado: ${item.material}\n`;
+          text += `   • Cantidad: *${item.cantidad} ${item.cantidad === 1 ? 'unidad' : 'unidades'}*\n\n`;
         }
       });
-      if (notas.trim()) text += `\n📝 *Notas:* ${notas.trim()}\n`;
+      text += '────────────────────\n';
+      text += `📊 *TOTAL UNIDADES:* *${totalProductos}*\n\n`;
+
+      if (notas.trim()) {
+        text += `📝 *OBSERVACIONES / NOTAS:*\n${notas.trim()}\n\n`;
+      }
+
+      text += '━━━━━━━━━━━━━━━━━━━━\n';
+      text += '🌐 _Generado desde nanocarbon.pages.dev_';
 
       const phone = '3158512091';
       const encodedText = encodeURIComponent(text);
@@ -222,7 +255,7 @@ export default function CartPage() {
 
       {/* Datos del Cliente */}
       <div className={styles.clientForm}>
-        <div className={styles.formTitle}>Datos de Entrega / Contacto</div>
+        <div className={styles.formTitle}>📋 Datos de Despacho y Contacto</div>
         <div className={styles.formGrid}>
           <input
             type="text"
@@ -250,11 +283,18 @@ export default function CartPage() {
           <input
             type="text"
             className={styles.formInput}
-            placeholder="Notas u observaciones (opcional)"
-            value={notas}
-            onChange={(e) => setNotas(e.target.value)}
+            placeholder="Dirección o transportadora (opcional)"
+            value={clienteDireccion}
+            onChange={(e) => setClienteDireccion(e.target.value)}
           />
         </div>
+        <input
+          type="text"
+          className={styles.formInput}
+          placeholder="Notas adicionales o requerimientos especiales (opcional)"
+          value={notas}
+          onChange={(e) => setNotas(e.target.value)}
+        />
       </div>
 
       <div className={styles.summary}>
@@ -271,7 +311,7 @@ export default function CartPage() {
           onClick={enviarWhatsApp}
           disabled={isSending}
         >
-          {isSending ? 'Procesando...' : '📱 Enviar pedido por WhatsApp'}
+          {isSending ? 'Procesando orden...' : '🚀 Confirmar y Enviar Pedido por WhatsApp'}
         </button>
       </div>
     </div>
