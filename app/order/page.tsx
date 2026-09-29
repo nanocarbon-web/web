@@ -345,6 +345,9 @@ export default function OrderPage() {
                       setAutoMarca('Mercedes-Benz');
                       const mb = AUTOMOTIVE_DATABASE.find(b => b.nombre === 'Mercedes-Benz');
                       setAutoModelo(mb?.modelos[0] || '');
+                      if (material.includes('AntiEspía')) {
+                        setMaterial('Clear (Transparente)');
+                      }
                     } else {
                       const cat = db.find(c => c.tipo.toLowerCase() === tipo.toLowerCase());
                       if (cat && cat.marcas.length > 0) {
@@ -604,17 +607,19 @@ export default function OrderPage() {
               />
               <span>Mate (Antirreflejo)</span>
             </label>
-            <label className={styles.radioLabel}>
-              <input 
-                type="radio" 
-                name="material" 
-                value="AntiEspía (Privacidad)" 
-                checked={material === 'AntiEspía (Privacidad)'}
-                onChange={(e) => setMaterial(e.target.value)}
-                style={{ accentColor: '#ffffff' }}
-              />
-              <span>AntiEspía (Privacidad)</span>
-            </label>
+            {tipoSeleccionado !== 'Automotriz' && (
+              <label className={styles.radioLabel}>
+                <input 
+                  type="radio" 
+                  name="material" 
+                  value="AntiEspía (Privacidad)" 
+                  checked={material === 'AntiEspía (Privacidad)'}
+                  onChange={(e) => setMaterial(e.target.value)}
+                  style={{ accentColor: '#ffffff' }}
+                />
+                <span>AntiEspía (Privacidad)</span>
+              </label>
+            )}
           </div>
         </div>
 
